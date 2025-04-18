@@ -1,12 +1,13 @@
 
 resource "google_container_cluster" "primary_cluster" {
-  project  = var.project_id
-  name     = var.cluster_name
-  location = var.region 
+  project             = var.project_id
+  name                = var.cluster_name
+  location            = var.region
+  deletion_protection = false
 
   # We are creating the node pool separately, so remove the default one
   remove_default_node_pool = true
-  initial_node_count       = 1 
+  initial_node_count       = 1
 
   network    = google_compute_network.gke_vpc.id
   subnetwork = google_compute_subnetwork.gke_subnet.id
@@ -29,7 +30,7 @@ resource "google_container_cluster" "primary_cluster" {
   private_cluster_config {
     enable_private_endpoint = false # Keep public endpoint for easier access initially
     # enable_private_nodes    = true # Set to true for private nodes (no external IPs) - requires Cloud NAT for egress
-    master_ipv4_cidr_block  = var.gke_master_ip_cidr_range
+    master_ipv4_cidr_block = var.gke_master_ip_cidr_range
   }
 
   # Recommended settings
@@ -54,6 +55,6 @@ resource "google_container_cluster" "primary_cluster" {
 
   # Avoid issues where destroying the network before the cluster causes errors
   lifecycle {
-    prevent_destroy = false 
+    prevent_destroy = false
   }
 }
